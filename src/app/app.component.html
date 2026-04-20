@@ -1,0 +1,12 @@
+﻿<header class="top-menu">
+  <nav>
+    <a routerLink="" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
+    <a routerLink="rutina" routerLinkActive="active">Rutina</a>
+    <a routerLink="historial" routerLinkActive="active">Historial de pesos</a>
+    <a routerLink="imc" routerLinkActive="active">IMC</a>
+    <a routerLink="perfil" routerLinkActive="active">Perfil</a>
+  </nav>
+</header>
+<main class="page-shell">
+  <router-outlet></router-outlet>
+</main>
