@@ -1,0 +1,12 @@
+﻿  loadExercises() {
+    this.exercises = [
+      { id: 1, nombre: 'Press de Banca', imagen: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop', pesoMaximo: 100, unidad: 'kg', fechaUltimo: '2026-04-20', series: 4 },
+      { id: 2, nombre: 'Bíceps con Mancuernas', imagen: 'https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=300&h=200&fit=crop', pesoMaximo: 30, unidad: 'kg', fechaUltimo: '2026-04-19', series: 3 },
+      { id: 3, nombre: 'Peso Muerto', imagen: 'https://images.unsplash.com/photo-1517963628607-235ccdd5476c?w=300&h=200&fit=crop', pesoMaximo: 150, unidad: 'kg', fechaUltimo: '2026-04-21', series: 3 },
+      { id: 4, nombre: 'Sentadilla', imagen: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop', pesoMaximo: 120, unidad: 'kg', fechaUltimo: '2026-04-20', series: 4 },
+      { id: 5, nombre: 'Dominadas', imagen: 'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=300&h=200&fit=crop', pesoMaximo: 80, unidad: 'kg', fechaUltimo: '2026-04-18', series: 3 },
+      { id: 6, nombre: 'Remo con Barra', imagen: 'https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=300&h=200&fit=crop', pesoMaximo: 110, unidad: 'kg', fechaUltimo: '2026-04-21', series: 4 },
+      { id: 7, nombre: 'Press Militar', imagen: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop', pesoMaximo: 60, unidad: 'kg', fechaUltimo: '2026-04-19', series: 3 },
+      { id: 8, nombre: 'Flexiones', imagen: 'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=300&h=200&fit=crop', pesoMaximo: 50, unidad: 'kg', fechaUltimo: '2026-04-21', series: 3 }
+    ];
+  }

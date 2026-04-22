@@ -1,0 +1,116 @@
+<div class="container mt-3">
+    <div class="row g-3">
+        <div class="col-12 col-md-6">
+            <div class="card">
+                <div class="card-header">Datos para calcular IMC</div>
+                <div class="card-body">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="peso-addon">Peso (Kg)</span>
+                        <input type="number" [(ngModel)]="peso" class="form-control" placeholder="Meta su peso" aria-label="Peso" aria-describedby="peso-addon">
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" id="altura-addon">Altura (m)</span>
+                        <input type="number" [(ngModel)]="altura" class="form-control" placeholder="Meta su altura" aria-label="Altura" aria-describedby="altura-addon">
+                    </div>
+
+                    <div class="d-flex justify-content-center">
+                        <button (click)="calcularIMC()" type="button" class="btn btn-primary" [disabled]="peso <= 0 || altura <= 0">Calcular IMC</button>
+                    </div>
+                </div>
+            </div>
+
+            @if (mediaAltura != 0) {
+                <div class="card mt-3">
+                    <div class="card-header">Estadísticas de IMC</div>
+                    <div class="card-body">
+                        <p class="mb-1"><strong>Media de altura:</strong> {{mediaAltura}} m</p>
+                        <p class="mb-0"><strong>Media de peso:</strong> {{mediaPeso}} Kg</p>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="col-12 col-md-6">
+            <div class="card h-100" id="seccionIMC">
+                <div class="card-header">Resultado</div>
+                <div class="card-body text-center d-flex flex-column justify-content-center">
+                    @if (imc != 0) {
+                        <p>Su IMC es: {{imc}}</p>
+                        <p>Tiene un perfil: {{perfil}}</p>
+                        @if (imagenPerfil) {
+                            <img [src]="imagenPerfil" [alt]="perfil" class="img-fluid mt-2 mx-auto d-block">
+                        }
+
+                        <div class="imc-indicador mt-3">
+                            <div class="imc-barra-zonas">
+                                <div class="zona zona-1" title="Bajo peso severo"></div>
+                                <div class="zona zona-2" title="Peso bajo"></div>
+                                <div class="zona zona-3" title="Peso normal"></div>
+                                <div class="zona zona-4" title="Sobrepeso"></div>
+                                <div class="zona zona-5" title="Obesidad"></div>
+                                <div class="aguja" [style.left.%]="posicionAgujaIMC"></div>
+                            </div>
+
+                            <div class="imc-marcas mt-1">
+                                <span>12</span>
+                                <span>16</span>
+                                <span>18</span>
+                                <span>25</span>
+                                <span>31</span>
+                                <span>40</span>
+                            </div>
+                        </div>
+                    } @else {
+                        <p class="mb-0">Introduzca sus datos y pulse "Calcular IMC" para ver el resultado.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (listaImcs.length > 0) {
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">Histórico de IMC</div>
+                    <div class="card-body">
+
+                        <div>
+                            <button (click)="ordenarPorIMC()" class="btn btn-sm btn-outline-secondary">Ordenar por IMC</button>
+                            <button (click)="borrarListado()" class="btn btn-sm btn-outline-secondary">Borrar listado</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Peso (Kg)</th>
+                                        <th>Altura (m)</th>
+                                        <th>IMC</th>
+                                        <th>Perfil</th>
+                                        <th class="text-end">Color</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (registro of listaImcs; track $index) {
+                                        <tr>
+                                            <td>{{ $index + 1 }}</td>
+                                            <td>{{ registro.peso }}</td>
+                                            <td>{{ registro.altura }}</td>
+                                            <td>{{ registro.imc }}</td>
+                                            <td>{{ registro.perfil }}</td>
+                                            <td class="text-end">
+                                                <span class="circulo-imc" [class]="'circulo-imc ' + obtenerClaseColorIMC(registro.imc)"></span>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

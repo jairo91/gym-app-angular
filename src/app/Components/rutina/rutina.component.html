@@ -1,0 +1,159 @@
+<div class="rutina-container">
+  <h1>Planificar Rutina de Entrenamiento</h1>
+
+  <!-- Sección de selección de fecha y entrenamiento -->
+  <div class="selection-section">
+    <div class="form-group">
+      <label for="fecha">Seleccionar Fecha:</label>
+      <input type="date" id="fecha" [(ngModel)]="selectedDate" class="date-input">
+    </div>
+
+    <div class="form-group">
+      <label for="workout">Seleccionar Entrenamiento:</label>
+      <select id="workout" [(ngModel)]="selectedWorkout" (ngModelChange)="onWorkoutChange()" class="workout-select">
+        <option [ngValue]="null">Selecciona un entrenamiento...</option>
+        <option *ngFor="let workout of workouts" [ngValue]="workout">
+          {{ workout.nombre }} - {{ workout.descripcion }}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Sección de ejercicios -->
+  <div *ngIf="selectedWorkout" class="exercises-section">
+    <div class="exercises-header">
+      <h2>Ejercicios del Entrenamiento</h2>
+      <button *ngIf="selectedWorkout.nombre === 'Entrenamiento a Medida'" (click)="abrirModalAgregarEjercicio()" class="btn-add-exercise">
+        ➕ Añadir Ejercicio
+      </button>
+    </div>
+
+    <div *ngIf="currentWorkoutExercises.length === 0 && selectedWorkout.nombre !== 'Entrenamiento a Medida'" class="no-exercises-message">
+      <p>Este entrenamiento no tiene ejercicios configurados.</p>
+    </div>
+
+    <div *ngFor="let exercise of currentWorkoutExercises" class="exercise-card">
+      <div class="exercise-header">
+        <div class="exercise-info">
+          <img [src]="exercise.imagen" [alt]="exercise.nombre" class="exercise-image">
+          <h3>{{ exercise.nombre }}</h3>
+        </div>
+        <button (click)="editarSerie(exercise)" class="btn-edit">
+          {{ exercise.editando ? 'Cancelar Edición' : 'Editar Series' }}
+        </button>
+      </div>
+
+      <!-- Formulario para agregar series -->
+      <div class="add-series-form">
+        <div class="input-group">
+          <label>Repeticiones:</label>
+          <input type="number" [(ngModel)]="exercise.repeticionesInput" placeholder="Ej: 10" min="1">
+        </div>
+        <div class="input-group">
+          <label>Peso (kg):</label>
+          <input type="number" [(ngModel)]="exercise.pesoInput" placeholder="Ej: 50" min="0" step="0.5">
+        </div>
+        <button (click)="agregarSerie(exercise)" class="btn-add-serie" [disabled]="!exercise.repeticionesInput || !exercise.pesoInput">
+          Insertar Serie
+        </button>
+      </div>
+
+      <!-- Tabla de series -->
+      <div class="series-table-container" *ngIf="exercise.series.length > 0">
+        <table class="series-table">
+          <thead>
+            <tr>
+              <th>Serie</th>
+              <th>Repeticiones</th>
+              <th>Peso</th>
+              <th *ngIf="exercise.editando">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let serie of exercise.series; let i = index">
+              <td>{{ getSerieNumber(i) }}</td>
+              <td>
+                <input *ngIf="exercise.editando" type="number" [(ngModel)]="serie.repeticiones" min="1" class="edit-input">
+                <span *ngIf="!exercise.editando">{{ serie.repeticiones }}</span>
+              </td>
+              <td>
+                <input *ngIf="exercise.editando" type="number" [(ngModel)]="serie.peso" min="0" step="0.5" class="edit-input">
+                <span *ngIf="!exercise.editando">{{ serie.peso }} {{ serie.unidad }}</span>
+              </td>
+              <td *ngIf="exercise.editando">
+                <button (click)="eliminarSerie(exercise, i)" class="btn-delete">Eliminar</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div *ngIf="exercise.editando" class="edit-actions">
+          <button (click)="guardarSerie(exercise)" class="btn-save">Guardar Cambios</button>
+        </div>
+      </div>
+
+      <div *ngIf="exercise.series.length === 0" class="no-series">
+        <p>No hay series agregadas aún. Agrega tu primera serie arriba.</p>
+      </div>
+    </div>
+
+    <!-- Botón guardar entrenamiento -->
+    <div class="save-workout-section">
+      <button (click)="guardarEntrenamiento()" class="btn-save-workout" [disabled]="isSaveWorkoutDisabled">
+        Guardar Entrenamiento Completo
+      </button>
+    </div>
+  </div>
+
+  <!-- Mensaje cuando no hay entrenamiento seleccionado -->
+  <div *ngIf="!selectedWorkout" class="no-workout-selected">
+    <div class="placeholder-content">
+      <h2>Selecciona un Entrenamiento</h2>
+      <p>Elige una fecha y un tipo de entrenamiento para comenzar a planificar tu rutina.</p>
+      <div class="workout-preview">
+        <h3>Entrenamientos Disponibles:</h3>
+        <ul>
+          <li *ngFor="let workout of workouts">
+            <strong>{{ workout.nombre }}</strong> - {{ workout.descripcion }}
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para agregar ejercicios -->
+<div *ngIf="showAddExerciseModal" class="modal-overlay" (click)="cerrarModalAgregarEjercicio()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Seleccionar Ejercicios</h3>
+      <button (click)="cerrarModalAgregarEjercicio()" class="btn-close">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <p>Selecciona los ejercicios que quieres incluir en tu entrenamiento personalizado:</p>
+
+      <div class="exercises-grid">
+        <div *ngFor="let exercise of availableExercises" class="exercise-item"
+             [class.selected]="isExerciseSelected(exercise)"
+             (click)="toggleExerciseSelection(exercise)">
+          <img [src]="exercise.imagen" [alt]="exercise.nombre" class="exercise-item-image">
+          <div class="exercise-item-info">
+            <h4>{{ exercise.nombre }}</h4>
+            <p>Peso máximo: {{ exercise.pesoMaximo }} {{ exercise.unidad }}</p>
+          </div>
+          <div class="exercise-checkbox">
+            <input type="checkbox" [checked]="isExerciseSelected(exercise)" readonly>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button (click)="cerrarModalAgregarEjercicio()" class="btn-cancel">Cancelar</button>
+      <button (click)="guardarEjerciciosSeleccionados()" class="btn-save" [disabled]="selectedExercises.length === 0">
+        Agregar {{ selectedExercises.length }} ejercicio{{ selectedExercises.length !== 1 ? 's' : '' }}
+      </button>
+    </div>
+  </div>
+</div>

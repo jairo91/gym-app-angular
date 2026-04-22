@@ -1,0 +1,74 @@
+.card-header {
+	font-size: 1.3rem;
+	font-weight: 700;
+}
+
+.card img {
+	max-height: 220px;
+	object-fit: contain;
+}
+
+.imc-indicador {
+	width: 100%;
+	max-width: 360px;
+	margin: 0 auto;
+}
+
+.imc-barra-zonas {
+	position: relative;
+	display: flex;
+	height: 18px;
+	border-radius: 999px;
+	overflow: hidden;
+	border: 1px solid #d9d9d9;
+}
+
+.zona-1 {
+	flex: 4;
+	background-color: #60a5fa;
+}
+
+.zona-2 {
+	flex: 2;
+	background-color: #93c5fd;
+}
+
+.zona-3 {
+	flex: 7;
+	background-color: #86efac;
+}
+
+.zona-4 {
+	flex: 6;
+	background-color: #fcd34d;
+}
+
+.zona-5 {
+	flex: 9;
+	background-color: #f87171;
+}
+
+.aguja {
+	position: absolute;
+	top: -6px;
+	width: 0;
+	height: 30px;
+	border-left: 3px solid #212529;
+	transform: translateX(-50%);
+	z-index: 2;
+}
+
+.imc-marcas {
+	display: flex;
+	justify-content: space-between;
+	font-size: 0.8rem;
+	color: #6c757d;
+}
+
+.circulo-imc {
+	display: inline-block;
+	width: 18px;
+	height: 18px;
+	border-radius: 50%;
+	border: 1px solid #adb5bd;
+}

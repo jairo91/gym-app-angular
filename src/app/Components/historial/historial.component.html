@@ -1,0 +1,90 @@
+﻿<div class="historial-container">
+  <h1>Historial de Ejercicios</h1>
+  
+  <div class="exercises-grid">
+    <div *ngFor="let exercise of exercises" class="exercise-card">
+      <div class="card-image">
+        <img [src]="exercise.imagen" [alt]="exercise.nombre" loading="lazy">
+      </div>
+      <div class="card-header">
+        <h3>{{ exercise.nombre }}</h3>
+      </div>
+      <div class="card-body">
+        <div class="weight-info">
+          <span class="label">Peso Máximo:</span>
+          <span class="value">{{ exercise.pesoMaximo }} {{ exercise.unidad }}</span>
+        </div>
+        <div class="series-info">
+          <span class="label">Series:</span>
+          <span class="value">{{ exercise.series }}</span>
+        </div>
+        <div class="date-info">
+          <span class="label">Último levantamiento:</span>
+          <span class="value">{{ exercise.fechaUltimo }}</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <button class="btn-historial" (click)="verHistorial(exercise)">
+          Ver Historial
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="showDetails && selectedExercise" class="modal-overlay" (click)="cerrarDetalle()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ selectedExercise.nombre }}</h2>
+        <button class="close-btn" (click)="cerrarDetalle()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="exercise-image-modal">
+          <img [src]="selectedExercise.imagen" [alt]="selectedExercise.nombre">
+        </div>
+        <div class="detail-item">
+          <span class="label">Peso Máximo Registrado:</span>
+          <span class="value">{{ selectedExercise.pesoMaximo }} {{ selectedExercise.unidad }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Series Habituales:</span>
+          <span class="value">{{ selectedExercise.series }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Último Levantamiento:</span>
+          <span class="value">{{ selectedExercise.fechaUltimo }}</span>
+        </div>
+        <div class="history-section">
+          <h3>Historial de Entrenamientos</h3>
+          <div class="history-table-container">
+            <table class="history-table" *ngIf="selectedExercise.historial && selectedExercise.historial.length > 0; else noHistory">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>No. Series</th>
+                  <th>Repeticiones</th>
+                  <th>Pesos</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let entry of selectedExercise.historial">
+                  <td>{{ entry.fecha }}</td>
+                  <td>{{ getSeriesCount(entry) }}</td>
+                  <td>{{ getRepeticionesString(entry) }}</td>
+                  <td>{{ getPesosString(entry) }}</td>
+                </tr>
+              </tbody>
+            </table>
+            <ng-template #noHistory>
+              <div class="no-history-message">
+                <p>No hay historial disponible para este ejercicio.</p>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-close" (click)="cerrarDetalle()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
