@@ -77,11 +77,8 @@ export class FirebaseEntrenamientoService {
   /**
    * Crear nuevo entrenamiento
    */
-  crearEntrenamiento(entrenamiento: Omit<Entrenamiento, 'id' | 'fechaCreacion' | 'fechaModificacion'>): Promise<number> {
-    const uid = this.auth.currentUser?.uid;
-    if (!uid) {
-      return Promise.reject('Usuario no autenticado');
-    }
+  async crearEntrenamiento(entrenamiento: Omit<Entrenamiento, 'id' | 'fechaCreacion' | 'fechaModificacion'>): Promise<number> {
+    const uid = await this.getFirebaseUid();
 
     const nuevoId = this.generarId();
     const ahora = new Date().toISOString();
@@ -94,21 +91,25 @@ export class FirebaseEntrenamientoService {
     };
 
     const entrenamientoRef = ref(this.db, `usuarios/${uid}/entrenamientos/${nuevoId}`);
-    return set(entrenamientoRef, {
+    await set(entrenamientoRef, {
       ...nuevoEntrenamiento,
       fechaCreacion: ahora,
       fechaModificacion: ahora
-    }).then(() => nuevoId);
+    });
+
+    this.entrenamientosSubject.next([
+      ...this.entrenamientosSubject.value,
+      nuevoEntrenamiento
+    ]);
+
+    return nuevoId;
   }
 
   /**
    * Actualizar entrenamiento
    */
-  actualizarEntrenamiento(id: number, cambios: Partial<Entrenamiento>): Promise<void> {
-    const uid = this.auth.currentUser?.uid;
-    if (!uid) {
-      return Promise.reject('Usuario no autenticado');
-    }
+  async actualizarEntrenamiento(id: number, cambios: Partial<Entrenamiento>): Promise<void> {
+    const uid = await this.getFirebaseUid();
 
     const ahora = new Date().toISOString();
     const updateData = {
@@ -120,20 +121,33 @@ export class FirebaseEntrenamientoService {
     delete (updateData as any).fechaCreacion;
 
     const entrenamientoRef = ref(this.db, `usuarios/${uid}/entrenamientos/${id}`);
-    return update(entrenamientoRef, updateData);
+    await update(entrenamientoRef, updateData);
+
+    this.entrenamientosSubject.next(
+      this.entrenamientosSubject.value.map(entrenamiento =>
+        entrenamiento.id === id
+          ? {
+              ...entrenamiento,
+              ...cambios,
+              fechaModificacion: new Date(ahora)
+            }
+          : entrenamiento
+      )
+    );
   }
 
   /**
    * Eliminar entrenamiento
    */
-  eliminarEntrenamiento(id: number): Promise<void> {
-    const uid = this.auth.currentUser?.uid;
-    if (!uid) {
-      return Promise.reject('Usuario no autenticado');
-    }
+  async eliminarEntrenamiento(id: number): Promise<void> {
+    const uid = await this.getFirebaseUid();
 
     const entrenamientoRef = ref(this.db, `usuarios/${uid}/entrenamientos/${id}`);
-    return remove(entrenamientoRef);
+    await remove(entrenamientoRef);
+
+    this.entrenamientosSubject.next(
+      this.entrenamientosSubject.value.filter(entrenamiento => entrenamiento.id !== id)
+    );
   }
 
   /**

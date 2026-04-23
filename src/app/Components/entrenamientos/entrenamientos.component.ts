@@ -6,7 +6,7 @@ import { Entrenamiento, EntrenamientoEjercicio } from '../../models/entrenamient
 import { Exercise } from '../../models/exercise/exercise.model';
 import { FirebaseEntrenamientoService } from '../../services/firebase-entrenamiento.service';
 import { FirebaseExerciseService } from '../../services/firebase-exercise.service';
-import { collectionGroup } from 'firebase/firestore';
+import { EntrenamientoService } from '../../services/entrenamiento.service';
 
 @Component({
   selector: 'app-entrenamientos',
@@ -16,7 +16,7 @@ import { collectionGroup } from 'firebase/firestore';
 })
 export class EntrenamientosComponent implements OnInit {
   entrenamientos$!: Observable<Entrenamiento[]>;
-  ejerciciosDisponibles$!: Observable<Exercise[]>;
+  availableExercises: Exercise[] = [];
   
   showCreateModal = false;
   showEditModal = false;
@@ -37,14 +37,26 @@ export class EntrenamientosComponent implements OnInit {
 
   constructor(
     private firebaseEntrenamiento: FirebaseEntrenamientoService,
-    private firebaseExercise: FirebaseExerciseService
+    private firebaseExercise: FirebaseExerciseService,
+    private entrenamientoService: EntrenamientoService
   ) {}
 
   ngOnInit() {
     // Inicializar observables después de la construcción
     console.log('Inicializando componentes y cargando datos...');
     this.entrenamientos$ = this.firebaseEntrenamiento.getEntrenamientos$();
-    this.ejerciciosDisponibles$ = this.firebaseExercise.getEjerciciosDisponibles$();
+    this.availableExercises = this.entrenamientoService.getEjerciciosDisponibles();
+
+    this.firebaseExercise.getEjerciciosDisponibles$().subscribe({
+      next: (ejercicios) => {
+        this.availableExercises = ejercicios.length > 0
+          ? ejercicios
+          : this.entrenamientoService.getEjerciciosDisponibles();
+      },
+      error: () => {
+        this.availableExercises = this.entrenamientoService.getEjerciciosDisponibles();
+      }
+    });
   }
 
   // Crear entrenamiento

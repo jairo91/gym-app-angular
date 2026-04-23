@@ -5,7 +5,9 @@
         ".read": "auth.uid === $uid",
         ".write": "auth.uid === $uid",
         "entrenamientos": {
-          ".validate": "newData.hasChildren(['nombre', 'descripcion', 'ejercicios', 'id', 'fechaCreacion', 'fechaModificacion'])"
+          "$entrenamientoId": {
+            ".validate": "newData.hasChildren(['nombre', 'descripcion', 'ejercicios', 'id', 'fechaCreacion', 'fechaModificacion'])"
+          }
         },
         "rutinas": {
           ".validate": "newData.hasChildren(['entrenamientoId', 'series'])"

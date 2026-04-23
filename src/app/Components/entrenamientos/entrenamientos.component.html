@@ -218,8 +218,12 @@
     <div class="modal-body">
       <p>Haz clic en los ejercicios que quieres incluir en tu entrenamiento:</p>
 
+      <div *ngIf="availableExercises.length === 0" class="no-exercises">
+        <p>No hay ejercicios disponibles en este momento.</p>
+      </div>
+
       <div class="exercises-grid">
-        <div *ngFor="let exercise of ejerciciosDisponibles$ | async"
+        <div *ngFor="let exercise of availableExercises"
              class="exercise-item"
              [class.selected]="isExerciseSelected(exercise)"
              (click)="toggleExerciseSelection(exercise)">

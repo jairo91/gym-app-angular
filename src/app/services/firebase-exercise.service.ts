@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Database, ref, get, set, update, remove, onValue } from '@angular/fire/database';
+import { Database, ref, get, set, update, onValue } from '@angular/fire/database';
 import { Auth } from '@angular/fire/auth';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject, map } from 'rxjs';
 import { Exercise } from '../models/exercise/exercise.model';
 import { ExerciseHistory } from '../models/exercise/exercise-history.model';
 
@@ -11,17 +11,27 @@ import { ExerciseHistory } from '../models/exercise/exercise-history.model';
 export class FirebaseExerciseService {
   private ejerciciosSubject = new BehaviorSubject<Exercise[]>([]);
   public ejercicios$ = this.ejerciciosSubject.asObservable();
+  private readonly ejerciciosPorDefecto = this.getEjerciciosPorDefecto();
 
   constructor(
     private db: Database,
     private auth: Auth
-  ) {}
+  ) {
+    void this.initializeService();
+  }
 
-  async ngOnInit() {
+  private async initializeService(): Promise<void> {
     console.log('Inicializando FirebaseExerciseService...');
-    await this.initializeDefaultExercises();  // Espera a que termine
-    this.setupRealTimeSync();                 // Ahora sí, escucha cambios
-}
+
+    try {
+      await this.initializeDefaultExercises();
+    } catch (error) {
+      console.error('Error inicializando ejercicios por defecto:', error);
+      this.ejerciciosSubject.next(this.ejerciciosPorDefecto);
+    }
+
+    this.setupRealTimeSync();
+  }
 
   /**
    * Configurar sincronización en tiempo real de ejercicios disponibles
@@ -38,6 +48,8 @@ export class FirebaseExerciseService {
           historial: ejercicio.historial || []
         }));
         this.ejerciciosSubject.next(ejercicios);
+      } else {
+        this.ejerciciosSubject.next(this.ejerciciosPorDefecto);
       }
     });
   }
@@ -45,26 +57,37 @@ export class FirebaseExerciseService {
   /**
    * Inicializar ejercicios por defecto si no existen
    */
-  private initializeDefaultExercises() {
+  private async initializeDefaultExercises(): Promise<void> {
     const ejerciciosRef = ref(this.db, 'ejercicios-disponibles');
-    
-    get(ejerciciosRef).then(snapshot => {
-      if (!snapshot.exists()) {
-        const ejerciciosDefecto = this.getEjerciciosPorDefecto();
-        const data: any = {};
-        ejerciciosDefecto.forEach(ej => {
-          data[ej.id] = ej;
-        });
-        set(ejerciciosRef, data);
-      }
+
+    const snapshot = await get(ejerciciosRef);
+    if (snapshot.exists()) {
+      return;
+    }
+
+    const ejerciciosDefecto = this.ejerciciosPorDefecto;
+    this.ejerciciosSubject.next(ejerciciosDefecto);
+
+    const data: Record<number, Exercise> = {};
+
+    ejerciciosDefecto.forEach(ej => {
+      data[ej.id] = ej;
     });
+
+    try {
+      await set(ejerciciosRef, data);
+    } catch (error) {
+      console.warn('No se pudieron persistir los ejercicios por defecto en Firebase. Se usarán localmente.', error);
+    }
   }
 
   /**
    * Obtener todos los ejercicios disponibles como observable
    */
   getEjerciciosDisponibles$(): Observable<Exercise[]> {
-    return this.ejercicios$;
+    return this.ejercicios$.pipe(
+      map(ejercicios => ejercicios.length > 0 ? ejercicios : this.ejerciciosPorDefecto)
+    );
   }
 
   /**
