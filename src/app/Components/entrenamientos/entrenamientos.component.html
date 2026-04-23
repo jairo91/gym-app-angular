@@ -1,0 +1,242 @@
+<div class="entrenamientos-container">
+  <div class="header">
+    <h1>Gestión de Entrenamientos</h1>
+    <button class="btn-create" (click)="abrirModalCrear()">
+      ➕ Crear Entrenamiento
+    </button>
+  </div>
+
+  <!-- Mensajes de error -->
+  <div *ngIf="errorMessage" class="alert alert-error">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Indicador de carga -->
+  <div *ngIf="isLoading" class="loading-indicator">
+    <p>Procesando...</p>
+  </div>
+
+  <div class="entrenamientos-grid">
+    <div *ngFor="let entrenamiento of entrenamientos$ | async" class="entrenamiento-card">
+      <div class="card-header">
+        <h3>{{ entrenamiento.nombre }}</h3>
+        <div class="card-actions">
+          <button class="btn-edit" (click)="abrirModalEditar(entrenamiento)" title="Editar" [disabled]="isLoading">
+            ✏️
+          </button>
+          <button class="btn-delete" (click)="eliminarEntrenamiento(entrenamiento.id)" title="Eliminar" [disabled]="isLoading">
+            🗑️
+          </button>
+        </div>
+      </div>
+
+      <p class="descripcion">{{ entrenamiento.descripcion }}</p>
+
+      <div class="ejercicios-preview">
+        <h4>Ejercicios ({{ entrenamiento.ejercicios.length }})</h4>
+        <div class="ejercicios-list">
+          <div *ngFor="let ejercicio of entrenamiento.ejercicios" class="ejercicio-item">
+            <img [src]="ejercicio.imagen" [alt]="ejercicio.nombre" class="ejercicio-image">
+            <div class="ejercicio-info">
+              <span class="ejercicio-nombre">{{ ejercicio.nombre }}</span>
+              <span class="ejercicio-config">
+                {{ ejercicio.seriesRecomendadas }} series × {{ ejercicio.repeticionesRecomendadas }}
+                <span *ngIf="ejercicio.pesoRecomendado"> • {{ ejercicio.pesoRecomendado }}kg</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <small>
+          Creado: {{ entrenamiento.fechaCreacion | date:'short' }} |
+          Modificado: {{ entrenamiento.fechaModificacion | date:'short' }}
+        </small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Crear Entrenamiento -->
+<div *ngIf="showCreateModal" class="modal-overlay" (click)="cerrarModalCrear()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Crear Nuevo Entrenamiento</h3>
+      <button (click)="cerrarModalCrear()" class="btn-close">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="nombre">Nombre del Entrenamiento:</label>
+        <input type="text" id="nombre" [(ngModel)]="nuevoEntrenamiento.nombre" placeholder="Ej: Tren Superior - Push">
+      </div>
+
+      <div class="form-group">
+        <label for="descripcion">Descripción:</label>
+        <textarea id="descripcion" [(ngModel)]="nuevoEntrenamiento.descripcion"
+                  placeholder="Describe el enfoque de este entrenamiento..."></textarea>
+      </div>
+
+      <div class="ejercicios-section">
+        <div class="ejercicios-header">
+          <h4>Ejercicios Seleccionados ({{ getSelectedExercisesCount() }})</h4>
+          <button class="btn-add-exercise" (click)="abrirModalEjercicios()">
+            ➕ Agregar Ejercicios
+          </button>
+        </div>
+
+        <div *ngIf="currentEntrenamientoExercises.length === 0" class="no-exercises">
+          <p>No hay ejercicios seleccionados. Haz clic en "Agregar Ejercicios" para comenzar.</p>
+        </div>
+
+        <div *ngFor="let ejercicio of currentEntrenamientoExercises" class="ejercicio-config-card">
+          <div class="ejercicio-config-header">
+            <img [src]="ejercicio.imagen" [alt]="ejercicio.nombre" class="ejercicio-config-image">
+            <span class="ejercicio-config-nombre">{{ ejercicio.nombre }}</span>
+            <button class="btn-remove" (click)="removerEjercicioDelEntrenamiento(ejercicio)" title="Remover">
+              ✕
+            </button>
+          </div>
+
+          <div class="ejercicio-config-form">
+            <div class="config-row">
+              <div class="config-field">
+                <label>Series:</label>
+                <input type="number" [(ngModel)]="ejercicio.seriesRecomendadas" min="1" max="10">
+              </div>
+              <div class="config-field">
+                <label>Repeticiones:</label>
+                <input type="text" [(ngModel)]="ejercicio.repeticionesRecomendadas" placeholder="8-12">
+              </div>
+              <div class="config-field">
+                <label>Peso sugerido (kg):</label>
+                <input type="number" [(ngModel)]="ejercicio.pesoRecomendado" min="0" step="0.5">
+              </div>
+            </div>
+            <div class="config-field">
+              <label>Notas:</label>
+              <input type="text" [(ngModel)]="ejercicio.notas" placeholder="Notas adicionales...">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button (click)="cerrarModalCrear()" class="btn-cancel">Cancelar</button>
+      <button (click)="guardarNuevoEntrenamiento()" class="btn-save"
+              [disabled]="!nuevoEntrenamiento.nombre.trim() || getSelectedExercisesCount() === 0">
+        Crear Entrenamiento
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Editar Entrenamiento -->
+<div *ngIf="showEditModal" class="modal-overlay" (click)="cerrarModalEditar()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Editar Entrenamiento</h3>
+      <button (click)="cerrarModalEditar()" class="btn-close">✕</button>
+    </div>
+
+    <div class="modal-body" *ngIf="editingEntrenamiento">
+      <div class="form-group">
+        <label for="edit-nombre">Nombre del Entrenamiento:</label>
+        <input type="text" id="edit-nombre" [(ngModel)]="editingEntrenamiento.nombre">
+      </div>
+
+      <div class="form-group">
+        <label for="edit-descripcion">Descripción:</label>
+        <textarea id="edit-descripcion" [(ngModel)]="editingEntrenamiento.descripcion"></textarea>
+      </div>
+
+      <div class="ejercicios-section">
+        <div class="ejercicios-header">
+          <h4>Ejercicios Seleccionados ({{ getSelectedExercisesCount() }})</h4>
+          <button class="btn-add-exercise" (click)="abrirModalEjercicios()">
+            ➕ Agregar Ejercicios
+          </button>
+        </div>
+
+        <div *ngIf="currentEntrenamientoExercises.length === 0" class="no-exercises">
+          <p>No hay ejercicios seleccionados. Haz clic en "Agregar Ejercicios" para comenzar.</p>
+        </div>
+
+        <div *ngFor="let ejercicio of currentEntrenamientoExercises" class="ejercicio-config-card">
+          <div class="ejercicio-config-header">
+            <img [src]="ejercicio.imagen" [alt]="ejercicio.nombre" class="ejercicio-config-image">
+            <span class="ejercicio-config-nombre">{{ ejercicio.nombre }}</span>
+            <button class="btn-remove" (click)="removerEjercicioDelEntrenamiento(ejercicio)" title="Remover">
+              ✕
+            </button>
+          </div>
+
+          <div class="ejercicio-config-form">
+            <div class="config-row">
+              <div class="config-field">
+                <label>Series:</label>
+                <input type="number" [(ngModel)]="ejercicio.seriesRecomendadas" min="1" max="10">
+              </div>
+              <div class="config-field">
+                <label>Repeticiones:</label>
+                <input type="text" [(ngModel)]="ejercicio.repeticionesRecomendadas">
+              </div>
+              <div class="config-field">
+                <label>Peso sugerido (kg):</label>
+                <input type="number" [(ngModel)]="ejercicio.pesoRecomendado" min="0" step="0.5">
+              </div>
+            </div>
+            <div class="config-field">
+              <label>Notas:</label>
+              <input type="text" [(ngModel)]="ejercicio.notas">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button (click)="cerrarModalEditar()" class="btn-cancel">Cancelar</button>
+      <button (click)="guardarEdicionEntrenamiento()" class="btn-save"
+              [disabled]="!editingEntrenamiento?.nombre?.trim() || getSelectedExercisesCount() === 0">
+        Guardar Cambios
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Seleccionar Ejercicios -->
+<div *ngIf="showExerciseModal" class="modal-overlay" (click)="cerrarModalEjercicios()">
+  <div class="modal-content exercise-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Seleccionar Ejercicios</h3>
+      <button (click)="cerrarModalEjercicios()" class="btn-close">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <p>Haz clic en los ejercicios que quieres incluir en tu entrenamiento:</p>
+
+      <div class="exercises-grid">
+        <div *ngFor="let exercise of ejerciciosDisponibles$ | async"
+             class="exercise-item"
+             [class.selected]="isExerciseSelected(exercise)"
+             (click)="toggleExerciseSelection(exercise)">
+          <img [src]="exercise.imagen" [alt]="exercise.nombre" class="exercise-image">
+          <div class="exercise-info">
+            <h4>{{ exercise.nombre }}</h4>
+            <p>RM: {{ exercise.pesoMaximo }} {{ exercise.unidad }}</p>
+          </div>
+          <div class="exercise-checkbox">
+            <input type="checkbox" [checked]="isExerciseSelected(exercise)" readonly>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button (click)="cerrarModalEjercicios()" class="btn-cancel">Cerrar</button>
+    </div>
+  </div>
+</div>

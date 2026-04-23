@@ -1,0 +1,27 @@
+{
+  "rules": {
+    "usuarios": {
+      "$uid": {
+        ".read": "auth.uid === $uid",
+        ".write": "auth.uid === $uid",
+        "entrenamientos": {
+          ".validate": "newData.hasChildren(['nombre', 'descripcion', 'ejercicios', 'id', 'fechaCreacion', 'fechaModificacion'])"
+        },
+        "rutinas": {
+          ".validate": "newData.hasChildren(['entrenamientoId', 'series'])"
+        },
+        "historial": {
+          ".validate": "newData.hasChildren(['ejercicioId', 'nombreEjercicio', 'fecha', 'peso', 'repeticiones', 'series'])"
+        },
+        "historial-ejercicios": {
+          ".validate": "newData.isObject() || newData.val() === null"
+        }
+      }
+    },
+    "ejercicios-disponibles": {
+      ".read": true,
+      ".write": false,
+      ".validate": "newData.hasChildren(['nombre', 'imagen', 'pesoMaximo', 'unidad'])"
+    }
+  }
+}
