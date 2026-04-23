@@ -92,8 +92,7 @@ export class EntrenamientosComponent implements OnInit {
     this.cerrarModalCrear();
     console.log('Guardando entrenamiento...', entrenamientoPayload);
 
-    this.firebaseEntrenamiento.crearEntrenamiento(entrenamientoPayload
-    }).then(() => {
+    this.firebaseEntrenamiento.crearEntrenamiento(entrenamientoPayload).then(() => {
       console.log('Entrenamiento creado correctamente');
       this.isLoading = false;
     }).catch(error => {
