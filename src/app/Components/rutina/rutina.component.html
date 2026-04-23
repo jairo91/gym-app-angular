@@ -99,8 +99,11 @@
 
     <!-- Botón guardar entrenamiento -->
     <div class="save-workout-section">
-      <button (click)="guardarEntrenamiento()" class="btn-save-workout" [disabled]="isSaveWorkoutDisabled">
-        Guardar Entrenamiento Completo
+      <div *ngIf="savedMessage" class="save-message" [class.error]="savedMessage.includes('\u274c')">
+        {{ savedMessage }}
+      </div>
+      <button (click)="guardarEntrenamiento()" class="btn-save-workout" [disabled]="isSaveWorkoutDisabled || isSaving">
+        {{ isSaving ? 'Guardando...' : 'Guardar Entrenamiento Completo' }}
       </button>
     </div>
   </div>

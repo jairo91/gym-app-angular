@@ -279,6 +279,21 @@
   border-radius: 8px;
 }
 
+.save-message {
+  display: inline-block;
+  margin-bottom: 14px;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 15px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #28a745;
+}
+
+.save-message.error {
+  color: #dc3545;
+}
+
 .btn-save-workout {
   background: white;
   color: #667eea;
