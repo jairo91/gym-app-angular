@@ -90,16 +90,21 @@ export class FirebaseEntrenamientoService {
       fechaModificacion: new Date(ahora)
     };
 
-    const entrenamientoRef = ref(this.db, `usuarios/${uid}/entrenamientos/${nuevoId}`);
-    await set(entrenamientoRef, {
-      ...nuevoEntrenamiento,
-      fechaCreacion: ahora,
-      fechaModificacion: ahora
-    });
-
     this.entrenamientosSubject.next([
       ...this.entrenamientosSubject.value,
       nuevoEntrenamiento
+    ]);
+
+    const entrenamientoRef = ref(this.db, `usuarios/${uid}/entrenamientos/${nuevoId}`);
+    await Promise.race([
+      set(entrenamientoRef, {
+        ...nuevoEntrenamiento,
+        fechaCreacion: ahora,
+        fechaModificacion: ahora
+      }),
+      new Promise((_, reject) =>
+        setTimeout(() => reject('Timeout al guardar entrenamiento en Firebase'), 8000)
+      )
     ]);
 
     return nuevoId;
@@ -207,8 +212,18 @@ export class FirebaseEntrenamientoService {
    * Obtener Firebase UID del usuario actual
    */
   private getFirebaseUid(): Promise<string> {
+    if (this.auth.currentUser?.uid) {
+      return Promise.resolve(this.auth.currentUser.uid);
+    }
+
     return new Promise((resolve, reject) => {
+      const timeoutId = setTimeout(() => {
+        unsubscribe();
+        reject('No se pudo obtener el usuario autenticado');
+      }, 5000);
+
       const unsubscribe = this.auth.onAuthStateChanged(user => {
+        clearTimeout(timeoutId);
         unsubscribe();
         if (user) {
           resolve(user.uid);

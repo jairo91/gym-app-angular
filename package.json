@@ -7,7 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "deploy:db-rules": "firebase deploy --only database"
+    "deploy:db-rules": "npx.cmd --yes firebase-tools@15.15.0 deploy --only database --project gym-app-a1964"
   },
   "private": true,
   "dependencies": {
@@ -31,6 +31,7 @@
     "@angular/cli": "^19.0.0",
     "@angular/compiler-cli": "^19.0.0",
     "@types/jasmine": "~5.1.0",
+    "firebase-tools": "^13.35.1",
     "jasmine-core": "~5.4.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",

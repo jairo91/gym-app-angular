@@ -16,6 +16,7 @@ export const appConfig: ApplicationConfig = {
       storageBucket: "gym-app-a1964.firebasestorage.app", 
       apiKey: "AIzaSyAjTsqHYZG_xY2AGGGwLN4861G2iWavTTE", 
       authDomain: "gym-app-a1964.firebaseapp.com", 
+      databaseURL: "https://gym-app-a1964-default-rtdb.europe-west1.firebasedatabase.app",
       messagingSenderId: "704224083199", 
       measurementId: "G-LK6BV5Z7HK"})), provideAuth(() => getAuth()), 
       provideAnalytics(() => getAnalytics()), 

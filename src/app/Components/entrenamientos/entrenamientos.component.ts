@@ -80,18 +80,30 @@ export class EntrenamientosComponent implements OnInit {
       return;
     }
 
+    const entrenamientoPayload = {
+      nombre: this.nuevoEntrenamiento.nombre,
+      descripcion: this.nuevoEntrenamiento.descripcion,
+      ejercicios: [...this.currentEntrenamientoExercises]
+    };
+
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.firebaseEntrenamiento.crearEntrenamiento({
-      nombre: this.nuevoEntrenamiento.nombre,
-      descripcion: this.nuevoEntrenamiento.descripcion,
-      ejercicios: this.currentEntrenamientoExercises
+    this.cerrarModalCrear();
+    console.log('Guardando entrenamiento...', entrenamientoPayload);
+
+    this.firebaseEntrenamiento.crearEntrenamiento(entrenamientoPayload
     }).then(() => {
-      this.cerrarModalCrear();
+      console.log('Entrenamiento creado correctamente');
       this.isLoading = false;
     }).catch(error => {
-      this.errorMessage = 'Error al crear entrenamiento: ' + error;
+      console.error('Error al crear entrenamiento:', error);
+      const errorText = typeof error === 'string' ? error : JSON.stringify(error);
+      if (errorText.includes('PERMISSION_DENIED') || errorText.includes('permission_denied')) {
+        this.errorMessage = 'Permisos de Firebase insuficientes. Debes desplegar las reglas de Realtime Database.';
+      } else {
+        this.errorMessage = 'Error al crear entrenamiento: ' + errorText;
+      }
       this.isLoading = false;
     });
   }
@@ -162,12 +174,11 @@ export class EntrenamientosComponent implements OnInit {
   toggleExerciseSelection(exercise: Exercise) {
     const index = this.selectedExercises.findIndex(ex => ex.id === exercise.id);
     if (index > -1) {
-      // Remover ejercicio
-      this.selectedExercises.splice(index, 1);
+      // Remover ejercicio — crear nuevo array para que Angular detecte el cambio
+      this.selectedExercises = this.selectedExercises.filter(ex => ex.id !== exercise.id);
       this.currentEntrenamientoExercises = this.currentEntrenamientoExercises.filter(ex => ex.id !== exercise.id);
     } else {
-      // Agregar ejercicio
-      this.selectedExercises.push(exercise);
+      // Agregar ejercicio — crear nuevo array para que Angular detecte el cambio
       const entrenamientoEjercicio: EntrenamientoEjercicio = {
         id: exercise.id,
         nombre: exercise.nombre,
@@ -177,7 +188,8 @@ export class EntrenamientosComponent implements OnInit {
         pesoRecomendado: exercise.pesoMaximo * 0.7,
         notas: ''
       };
-      this.currentEntrenamientoExercises.push(entrenamientoEjercicio);
+      this.selectedExercises = [...this.selectedExercises, exercise];
+      this.currentEntrenamientoExercises = [...this.currentEntrenamientoExercises, entrenamientoEjercicio];
     }
   }
 
@@ -193,7 +205,7 @@ export class EntrenamientosComponent implements OnInit {
 
   // Helpers
   getSelectedExercisesCount(): number {
-    return this.selectedExercises.length;
+    return this.currentEntrenamientoExercises.length;
   }
 
   formatDate(date: Date): string {
