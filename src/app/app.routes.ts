@@ -5,12 +5,14 @@ import { RegisterComponent } from './Components/register/register.component';
 import { ImcComponent } from './Components/imc/imc.component';
 import { HistorialComponent } from './Components/historial/historial.component';
 import { RutinaComponent } from './Components/rutina/rutina.component';
+import { EntrenamientosComponent } from './Components/entrenamientos/entrenamientos.component';
 import { AuthGuard } from './guards/auth.guard';
+import { HomeComponent } from './Components/home/home.component';
 
 export const routes: Routes = [
   {
     path: '',
-    component: MainComponent
+    component: HomeComponent
   },
   {
     path: 'login',
@@ -28,6 +30,11 @@ export const routes: Routes = [
   {
     path: 'historial',
     component: HistorialComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'entrenamientos',
+    component: EntrenamientosComponent,
     canActivate: [AuthGuard]
   },
   {

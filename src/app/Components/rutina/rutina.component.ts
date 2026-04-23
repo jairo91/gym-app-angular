@@ -1,9 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Workout, WorkoutExercise } from '../../models/workout/workout.model';
 import { Serie } from '../../models/exercise/exercise-history.model';
 import { Exercise } from '../../models/exercise/exercise.model';
+import { EntrenamientoService } from '../../services/entrenamiento.service';
+import { Entrenamiento } from '../../models/entrenamiento/entrenamiento.model';
 
 @Component({
   selector: 'app-rutina',
@@ -11,7 +13,7 @@ import { Exercise } from '../../models/exercise/exercise.model';
   templateUrl: './rutina.component.html',
   styleUrl: './rutina.component.css'
 })
-export class RutinaComponent {
+export class RutinaComponent implements OnInit {
   selectedDate: string = '';
   selectedWorkout: Workout | null = null;
   workouts: Workout[] = [];
@@ -20,10 +22,13 @@ export class RutinaComponent {
   availableExercises: Exercise[] = [];
   selectedExercises: Exercise[] = [];
 
-  constructor() {
+  constructor(private entrenamientoService: EntrenamientoService) {
+    this.setDefaultDate();
+  }
+
+  ngOnInit() {
     this.loadWorkouts();
     this.loadAvailableExercises();
-    this.setDefaultDate();
   }
 
   setDefaultDate() {
@@ -32,247 +37,36 @@ export class RutinaComponent {
   }
 
   loadWorkouts() {
-    // Workouts predefinidos
-    this.workouts = [
-      {
-        id: 1,
-        nombre: 'Tren Superior - Push',
-        descripcion: 'Enfoque en pecho, hombros y tríceps',
-        ejercicios: [
-          {
-            id: 1,
-            nombre: 'Press de Banca',
-            imagen: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop',
-            series: [],
-            repeticionesInput: undefined,
-            pesoInput: undefined,
-            editando: false
-          },
-          {
-            id: 2,
-            nombre: 'Press Militar',
-            imagen: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop',
-            series: [],
-            repeticionesInput: undefined,
-            pesoInput: undefined,
-            editando: false
-          },
-          {
-            id: 3,
-            nombre: 'Extensión de Tríceps',
-            imagen: 'https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=300&h=200&fit=crop',
-            series: [],
-            repeticionesInput: undefined,
-            pesoInput: undefined,
-            editando: false
-          }
-        ]
-      },
-      {
-        id: 2,
-        nombre: 'Tren Superior - Pull',
-        descripcion: 'Enfoque en espalda y bíceps',
-        ejercicios: [
-          {
-            id: 4,
-            nombre: 'Dominadas',
-            imagen: 'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=300&h=200&fit=crop',
-            series: [],
-            repeticionesInput: undefined,
-            pesoInput: undefined,
-            editando: false
-          },
-          {
-            id: 5,
-            nombre: 'Remo con Barra',
-            imagen: 'https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=300&h=200&fit=crop',
-            series: [],
-            repeticionesInput: undefined,
-            pesoInput: undefined,
-            editando: false
-          },
-          {
-            id: 6,
-            nombre: 'Bíceps con Mancuernas',
-            imagen: 'https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=300&h=200&fit=crop',
-            series: [],
-            repeticionesInput: undefined,
-            pesoInput: undefined,
-            editando: false
-          }
-        ]
-      },
-      {
-        id: 3,
-        nombre: 'Tren Inferior',
-        descripcion: 'Enfoque en piernas y glúteos',
-        ejercicios: [
-          {
-            id: 7,
-            nombre: 'Sentadilla',
-            imagen: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop',
-            series: [],
-            repeticionesInput: undefined,
-            pesoInput: undefined,
-            editando: false
-          },
-          {
-            id: 8,
-            nombre: 'Peso Muerto',
-            imagen: 'https://images.unsplash.com/photo-1517963628607-235ccdd5476c?w=300&h=200&fit=crop',
-            series: [],
-            repeticionesInput: undefined,
-            pesoInput: undefined,
-            editando: false
-          },
-          {
-            id: 9,
-            nombre: 'Prensa de Piernas',
-            imagen: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop',
-            series: [],
-            repeticionesInput: undefined,
-            pesoInput: undefined,
-            editando: false
-          }
-        ]
-      },
-      {
-        id: 4,
-        nombre: 'Full Body',
-        descripcion: 'Entrenamiento completo del cuerpo',
-        ejercicios: [
-          {
-            id: 10,
-            nombre: 'Press de Banca',
-            imagen: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop',
-            series: [],
-            repeticionesInput: undefined,
-            pesoInput: undefined,
-            editando: false
-          },
-          {
-            id: 11,
-            nombre: 'Sentadilla',
-            imagen: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop',
-            series: [],
-            repeticionesInput: undefined,
-            pesoInput: undefined,
-            editando: false
-          },
-          {
-            id: 12,
-            nombre: 'Dominadas',
-            imagen: 'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=300&h=200&fit=crop',
-            series: [],
-            repeticionesInput: undefined,
-            pesoInput: undefined,
-            editando: false
-          }
-        ]
-      },
-      {
-        id: 5,
-        nombre: 'Entrenamiento a Medida',
-        descripcion: 'Crea tu propio entrenamiento seleccionando ejercicios personalizados',
-        ejercicios: []
-      }
-    ];
+    // Cargar entrenamientos desde el servicio
+    const entrenamientos = this.entrenamientoService.getEntrenamientos();
+
+    // Convertir Entrenamiento[] a Workout[] para compatibilidad
+    this.workouts = entrenamientos.map(ent => ({
+      id: ent.id,
+      nombre: ent.nombre,
+      descripcion: ent.descripcion,
+      ejercicios: ent.ejercicios.map(ej => ({
+        id: ej.id,
+        nombre: ej.nombre,
+        imagen: ej.imagen,
+        series: [],
+        repeticionesInput: undefined,
+        pesoInput: undefined,
+        editando: false
+      }))
+    }));
+
+    // Agregar opción de entrenamiento a medida
+    this.workouts.push({
+      id: 999,
+      nombre: 'Entrenamiento a Medida',
+      descripcion: 'Crea tu propio entrenamiento seleccionando ejercicios personalizados',
+      ejercicios: []
+    });
   }
 
   loadAvailableExercises() {
-    // Cargar ejercicios disponibles desde la "base de datos" (mismos que en historial)
-    this.availableExercises = [
-      {
-        id: 1,
-        nombre: 'Press de Banca',
-        imagen: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop',
-        pesoMaximo: 100,
-        unidad: 'kg',
-        fechaUltimo: '2026-04-20',
-        series: 4,
-        historial: []
-      },
-      {
-        id: 2,
-        nombre: 'Bíceps con Mancuernas',
-        imagen: 'https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=300&h=200&fit=crop',
-        pesoMaximo: 30,
-        unidad: 'kg',
-        fechaUltimo: '2026-04-19',
-        series: 3,
-        historial: []
-      },
-      {
-        id: 3,
-        nombre: 'Peso Muerto',
-        imagen: 'https://images.unsplash.com/photo-1517963628607-235ccdd5476c?w=300&h=200&fit=crop',
-        pesoMaximo: 150,
-        unidad: 'kg',
-        fechaUltimo: '2026-04-21',
-        series: 3,
-        historial: []
-      },
-      {
-        id: 4,
-        nombre: 'Sentadilla',
-        imagen: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop',
-        pesoMaximo: 120,
-        unidad: 'kg',
-        fechaUltimo: '2026-04-20',
-        series: 4,
-        historial: []
-      },
-      {
-        id: 5,
-        nombre: 'Dominadas',
-        imagen: 'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=300&h=200&fit=crop',
-        pesoMaximo: 80,
-        unidad: 'kg',
-        fechaUltimo: '2026-04-18',
-        series: 3,
-        historial: []
-      },
-      {
-        id: 6,
-        nombre: 'Remo con Barra',
-        imagen: 'https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=300&h=200&fit=crop',
-        pesoMaximo: 110,
-        unidad: 'kg',
-        fechaUltimo: '2026-04-21',
-        series: 4,
-        historial: []
-      },
-      {
-        id: 7,
-        nombre: 'Press Militar',
-        imagen: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop',
-        pesoMaximo: 60,
-        unidad: 'kg',
-        fechaUltimo: '2026-04-19',
-        series: 3,
-        historial: []
-      },
-      {
-        id: 8,
-        nombre: 'Extensión de Tríceps',
-        imagen: 'https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=300&h=200&fit=crop',
-        pesoMaximo: 40,
-        unidad: 'kg',
-        fechaUltimo: '2026-04-18',
-        series: 3,
-        historial: []
-      },
-      {
-        id: 9,
-        nombre: 'Prensa de Piernas',
-        imagen: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop',
-        pesoMaximo: 200,
-        unidad: 'kg',
-        fechaUltimo: '2026-04-20',
-        series: 4,
-        historial: []
-      }
-    ];
+    this.availableExercises = this.entrenamientoService.getEjerciciosDisponibles();
   }
 
   get isSaveWorkoutDisabled(): boolean {

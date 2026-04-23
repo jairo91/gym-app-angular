@@ -5,6 +5,7 @@
     <a *ngIf="!isLoggedIn" routerLink="/register" routerLinkActive="active">Register</a>
     <a *ngIf="isLoggedIn" routerLink="/rutina" routerLinkActive="active">Rutina</a>
     <a *ngIf="isLoggedIn" routerLink="/historial" routerLinkActive="active">Historial de pesos</a>
+    <a *ngIf="isLoggedIn" routerLink="/entrenamientos" routerLinkActive="active">Gestión de Entrenamientos</a>
     <a *ngIf="isLoggedIn" routerLink="/imc" routerLinkActive="active">IMC</a>
     <a *ngIf="isLoggedIn" routerLink="/perfil" routerLinkActive="active">Perfil</a>
     <a *ngIf="isLoggedIn" (click)="logout()" style="cursor: pointer;">Logout</a>

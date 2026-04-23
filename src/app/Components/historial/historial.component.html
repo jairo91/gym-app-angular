@@ -2,21 +2,18 @@
   <h1>Historial de Ejercicios</h1>
   
   <div class="exercises-grid">
-    <div *ngFor="let exercise of exercises" class="exercise-card">
-      <div class="card-image">
-        <img [src]="exercise.imagen" [alt]="exercise.nombre" loading="lazy">
-      </div>
+    <div *ngFor="let exercise of ejercicios$ | async" class="exercise-card">
       <div class="card-header">
         <h3>{{ exercise.nombre }}</h3>
       </div>
       <div class="card-body">
         <div class="weight-info">
           <span class="label">Peso Máximo:</span>
-          <span class="value">{{ exercise.pesoMaximo }} {{ exercise.unidad }}</span>
+          <span class="value">{{ exercise.pesoMaximo }} kg</span>
         </div>
         <div class="series-info">
-          <span class="label">Series:</span>
-          <span class="value">{{ exercise.series }}</span>
+          <span class="label">Total Registros:</span>
+          <span class="value">{{ exercise.totalRegistros }}</span>
         </div>
         <div class="date-info">
           <span class="label">Último levantamiento:</span>
@@ -31,6 +28,7 @@
     </div>
   </div>
 
+  <!-- Modal con detalles del ejercicio -->
   <div *ngIf="showDetails && selectedExercise" class="modal-overlay" (click)="cerrarDetalle()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
@@ -38,16 +36,13 @@
         <button class="close-btn" (click)="cerrarDetalle()">×</button>
       </div>
       <div class="modal-body">
-        <div class="exercise-image-modal">
-          <img [src]="selectedExercise.imagen" [alt]="selectedExercise.nombre">
-        </div>
         <div class="detail-item">
           <span class="label">Peso Máximo Registrado:</span>
-          <span class="value">{{ selectedExercise.pesoMaximo }} {{ selectedExercise.unidad }}</span>
+          <span class="value">{{ selectedExercise.pesoMaximo }} kg</span>
         </div>
         <div class="detail-item">
-          <span class="label">Series Habituales:</span>
-          <span class="value">{{ selectedExercise.series }}</span>
+          <span class="label">Total Registros:</span>
+          <span class="value">{{ selectedExercise.totalRegistros }}</span>
         </div>
         <div class="detail-item">
           <span class="label">Último Levantamiento:</span>
@@ -56,21 +51,23 @@
         <div class="history-section">
           <h3>Historial de Entrenamientos</h3>
           <div class="history-table-container">
-            <table class="history-table" *ngIf="selectedExercise.historial && selectedExercise.historial.length > 0; else noHistory">
+            <table class="history-table" *ngIf="selectedExercise.registros && selectedExercise.registros.length > 0; else noHistory">
               <thead>
                 <tr>
                   <th>Fecha</th>
-                  <th>No. Series</th>
+                  <th>Series</th>
                   <th>Repeticiones</th>
-                  <th>Pesos</th>
+                  <th>Peso</th>
+                  <th>Notas</th>
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let entry of selectedExercise.historial">
-                  <td>{{ entry.fecha }}</td>
-                  <td>{{ getSeriesCount(entry) }}</td>
-                  <td>{{ getRepeticionesString(entry) }}</td>
-                  <td>{{ getPesosString(entry) }}</td>
+                <tr *ngFor="let registro of selectedExercise.registros">
+                  <td>{{ registro.fecha | date: 'dd/MM/yyyy' }}</td>
+                  <td>{{ registro.series }}</td>
+                  <td>{{ registro.repeticiones }}</td>
+                  <td>{{ registro.peso }} kg</td>
+                  <td>{{ registro.notas || '-' }}</td>
                 </tr>
               </tbody>
             </table>
@@ -88,3 +85,4 @@
     </div>
   </div>
 </div>
+
