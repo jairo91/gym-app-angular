@@ -19,6 +19,9 @@
         },
         "historial-ejercicios": {
           ".validate": "newData.isObject() || newData.val() === null"
+        },
+        "perfil": {
+          ".validate": "newData.hasChildren(['nombre'])"
         }
       }
     },
