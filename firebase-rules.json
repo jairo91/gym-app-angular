@@ -16,7 +16,7 @@
           ".validate": "newData.hasChildren(['ejercicioId', 'nombreEjercicio', 'fecha', 'peso', 'repeticiones', 'series'])"
         },
         "historial-ejercicios": {
-          ".validate": "newData.isObject() || newData.val() === null"
+          ".validate": "newData.val() === null || newData.hasChildren()"
         }
       }
     },
