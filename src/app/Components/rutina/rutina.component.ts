@@ -1,11 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Workout, WorkoutExercise } from '../../models/workout/workout.model';
 import { Serie } from '../../models/exercise/exercise-history.model';
 import { Exercise } from '../../models/exercise/exercise.model';
 import { EntrenamientoService } from '../../services/entrenamiento.service';
+import { FirebaseEntrenamientoService } from '../../services/firebase-entrenamiento.service';
+import { FirebaseHistorialService } from '../../services/firebase-historial.service';
 import { Entrenamiento } from '../../models/entrenamiento/entrenamiento.model';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-rutina',
@@ -13,7 +16,7 @@ import { Entrenamiento } from '../../models/entrenamiento/entrenamiento.model';
   templateUrl: './rutina.component.html',
   styleUrl: './rutina.component.css'
 })
-export class RutinaComponent implements OnInit {
+export class RutinaComponent implements OnInit, OnDestroy {
   selectedDate: string = '';
   selectedWorkout: Workout | null = null;
   workouts: Workout[] = [];
@@ -21,14 +24,25 @@ export class RutinaComponent implements OnInit {
   showAddExerciseModal = false;
   availableExercises: Exercise[] = [];
   selectedExercises: Exercise[] = [];
+  isSaving = false;
+  savedMessage = '';
+  private entrenamientosSub?: Subscription;
 
-  constructor(private entrenamientoService: EntrenamientoService) {
+  constructor(
+    private entrenamientoService: EntrenamientoService,
+    private firebaseEntrenamiento: FirebaseEntrenamientoService,
+    private firebaseHistorial: FirebaseHistorialService
+  ) {
     this.setDefaultDate();
   }
 
   ngOnInit() {
-    this.loadWorkouts();
+    this.loadWorkoutsFromFirebase();
     this.loadAvailableExercises();
+  }
+
+  ngOnDestroy() {
+    this.entrenamientosSub?.unsubscribe();
   }
 
   setDefaultDate() {
@@ -36,32 +50,41 @@ export class RutinaComponent implements OnInit {
     this.selectedDate = today.toISOString().split('T')[0];
   }
 
-  loadWorkouts() {
-    // Cargar entrenamientos desde el servicio
-    const entrenamientos = this.entrenamientoService.getEntrenamientos();
+  loadWorkoutsFromFirebase() {
+    this.entrenamientosSub = this.firebaseEntrenamiento.getEntrenamientos$().subscribe(entrenamientos => {
+      const entrenamientosMapeados: Workout[] = entrenamientos.map(ent => ({
+        id: ent.id,
+        nombre: ent.nombre,
+        descripcion: ent.descripcion,
+        ejercicios: ent.ejercicios.map(ej => ({
+          id: ej.id,
+          nombre: ej.nombre,
+          imagen: ej.imagen,
+          series: [],
+          repeticionesInput: undefined,
+          pesoInput: undefined,
+          editando: false
+        }))
+      }));
 
-    // Convertir Entrenamiento[] a Workout[] para compatibilidad
-    this.workouts = entrenamientos.map(ent => ({
-      id: ent.id,
-      nombre: ent.nombre,
-      descripcion: ent.descripcion,
-      ejercicios: ent.ejercicios.map(ej => ({
-        id: ej.id,
-        nombre: ej.nombre,
-        imagen: ej.imagen,
-        series: [],
-        repeticionesInput: undefined,
-        pesoInput: undefined,
-        editando: false
-      }))
-    }));
+      this.workouts = [
+        ...entrenamientosMapeados,
+        {
+          id: 999,
+          nombre: 'Entrenamiento a Medida',
+          descripcion: 'Crea tu propio entrenamiento seleccionando ejercicios personalizados',
+          ejercicios: []
+        }
+      ];
 
-    // Agregar opción de entrenamiento a medida
-    this.workouts.push({
-      id: 999,
-      nombre: 'Entrenamiento a Medida',
-      descripcion: 'Crea tu propio entrenamiento seleccionando ejercicios personalizados',
-      ejercicios: []
+      // Si el workout seleccionado ya no existe en la lista actualizada, lo deseleccionamos
+      if (this.selectedWorkout && this.selectedWorkout.id !== 999) {
+        const sigue = this.workouts.find(w => w.id === this.selectedWorkout!.id);
+        if (!sigue) {
+          this.selectedWorkout = null;
+          this.currentWorkoutExercises = [];
+        }
+      }
     });
   }
 
@@ -119,19 +142,47 @@ export class RutinaComponent implements OnInit {
     exercise.series.splice(index, 1);
   }
 
-  guardarEntrenamiento() {
-    // Aquí se guardaría todo el entrenamiento en la base de datos
-    const entrenamiento = {
-      fecha: this.selectedDate,
-      workout: this.selectedWorkout?.nombre,
-      ejercicios: this.currentWorkoutExercises.map(ex => ({
-        nombre: ex.nombre,
-        series: ex.series
-      }))
-    };
+  async guardarEntrenamiento() {
+    const ejerciciosConSeries = this.currentWorkoutExercises.filter(ex => ex.series.length > 0);
+    if (!ejerciciosConSeries.length) return;
 
-    console.log('Guardando entrenamiento:', entrenamiento);
-    alert('Entrenamiento guardado exitosamente!');
+    this.isSaving = true;
+    this.savedMessage = '';
+
+    try {
+      const promesas = ejerciciosConSeries.map(ex => {
+        const pesoMaximo = Math.max(...ex.series.map(s => s.peso));
+        const ultimaSerie = ex.series[ex.series.length - 1];
+        return this.firebaseHistorial.agregarAlHistorial({
+          ejercicioId: ex.id,
+          nombreEjercicio: ex.nombre,
+          fecha: new Date(this.selectedDate).toISOString(),
+          series: ex.series.length,
+          repeticiones: ultimaSerie.repeticiones,
+          peso: pesoMaximo,
+          notas: `${this.selectedWorkout?.nombre} — ${ex.series.map(s => `${s.repeticiones}x${s.peso}kg`).join(', ')}`
+        });
+      });
+
+      await Promise.all(promesas);
+
+      this.savedMessage = '✅ Entrenamiento guardado correctamente';
+      // Limpiar series tras guardar
+      this.currentWorkoutExercises = this.currentWorkoutExercises.map(ex => ({
+        ...ex,
+        series: [],
+        repeticionesInput: undefined,
+        pesoInput: undefined
+      }));
+    } catch (error: any) {
+      const msg = typeof error === 'string' ? error : JSON.stringify(error);
+      this.savedMessage = msg.includes('PERMISSION_DENIED')
+        ? '❌ Sin permisos en Firebase. Despliega las reglas de base de datos.'
+        : '❌ Error al guardar: ' + msg;
+    } finally {
+      this.isSaving = false;
+      setTimeout(() => (this.savedMessage = ''), 5000);
+    }
   }
 
   abrirModalAgregarEjercicio() {

@@ -6,6 +6,7 @@ import { ImcComponent } from './Components/imc/imc.component';
 import { HistorialComponent } from './Components/historial/historial.component';
 import { RutinaComponent } from './Components/rutina/rutina.component';
 import { EntrenamientosComponent } from './Components/entrenamientos/entrenamientos.component';
+import { PerfilComponent } from './Components/perfil/perfil.component';
 import { AuthGuard } from './guards/auth.guard';
 import { HomeComponent } from './Components/home/home.component';
 
@@ -44,7 +45,7 @@ export const routes: Routes = [
   },
   {
     path: 'perfil',
-    component: RegisterComponent, // O crea un componente de perfil
+    component: PerfilComponent,
     canActivate: [AuthGuard]
   }
 ];

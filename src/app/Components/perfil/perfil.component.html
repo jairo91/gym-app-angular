@@ -1,1 +1,79 @@
-<p>perfil works!</p>
+<div class="perfil-container">
+  <div class="perfil-header">
+    <div class="avatar">
+      <span>{{ perfil.nombre ? perfil.nombre[0].toUpperCase() : '?' }}</span>
+    </div>
+    <h1>{{ perfil.nombre || 'Mi Perfil' }}</h1>
+    <p class="email">{{ perfil.email }}</p>
+  </div>
+
+  <div *ngIf="message" class="alert" [class.alert-error]="isError">
+    {{ message }}
+  </div>
+
+  <div class="perfil-card">
+    <div class="card-header">
+      <h2>Datos Personales</h2>
+      <button *ngIf="!editando" class="btn-edit" (click)="activarEdicion()">✏️ Editar</button>
+    </div>
+
+    <div class="campos">
+      <!-- Nombre -->
+      <div class="campo">
+        <label>Nombre</label>
+        <input *ngIf="editando" type="text" [(ngModel)]="perfil.nombre" placeholder="Tu nombre">
+        <span *ngIf="!editando">{{ perfil.nombre || '—' }}</span>
+      </div>
+
+      <!-- Email (solo lectura) -->
+      <div class="campo">
+        <label>Correo electrónico</label>
+        <span>{{ perfil.email }}</span>
+      </div>
+
+      <!-- Edad -->
+      <div class="campo">
+        <label>Edad (años)</label>
+        <input *ngIf="editando" type="number" [(ngModel)]="perfil.edad" placeholder="Ej: 30" min="1" max="120">
+        <span *ngIf="!editando">{{ perfil.edad !== null ? perfil.edad + ' años' : '—' }}</span>
+      </div>
+
+      <!-- Altura -->
+      <div class="campo">
+        <label>Altura (cm)</label>
+        <input *ngIf="editando" type="number" [(ngModel)]="perfil.altura" placeholder="Ej: 175" min="50" max="250">
+        <span *ngIf="!editando">{{ perfil.altura !== null ? perfil.altura + ' cm' : '—' }}</span>
+      </div>
+
+      <!-- Peso -->
+      <div class="campo">
+        <label>Peso (kg)</label>
+        <input *ngIf="editando" type="number" [(ngModel)]="perfil.peso" placeholder="Ej: 75" min="20" max="300" step="0.1">
+        <span *ngIf="!editando">{{ perfil.peso !== null ? perfil.peso + ' kg' : '—' }}</span>
+      </div>
+
+      <!-- IMC calculado -->
+      <div class="campo imc-campo" *ngIf="imc !== null">
+        <label>IMC</label>
+        <span class="imc-valor">{{ imc }} <small>({{ imcCategoria }})</small></span>
+      </div>
+    </div>
+
+    <div *ngIf="editando" class="edit-actions">
+      <button class="btn-cancel" (click)="cancelarEdicion()">Cancelar</button>
+      <button class="btn-save" (click)="guardarPerfil()" [disabled]="isSaving">
+        {{ isSaving ? 'Guardando...' : 'Guardar Cambios' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="perfil-card seguridad-card">
+    <div class="card-header">
+      <h2>🔒 Seguridad</h2>
+    </div>
+    <p>Recibirás un correo para restablecer tu contraseña en <strong>{{ perfil.email }}</strong>.</p>
+    <button class="btn-reset" (click)="resetearContrasena()" [disabled]="resetSent">
+      {{ resetSent ? '✅ Correo enviado' : 'Resetear Contraseña' }}
+    </button>
+  </div>
+</div>
