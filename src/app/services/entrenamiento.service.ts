@@ -78,6 +78,7 @@ export class EntrenamientoService {
   // Obtener ejercicios disponibles para seleccionar
   getEjerciciosDisponibles(): Exercise[] {
     return [
+      // PECHO
       {
         id: 1,
         nombre: 'Press de Banca',
@@ -86,8 +87,10 @@ export class EntrenamientoService {
         unidad: 'kg',
         fechaUltimo: '2026-04-20',
         series: 4,
+        grupoMuscular: 'Pecho',
         historial: []
       },
+      // BÍCEPS
       {
         id: 2,
         nombre: 'Bíceps con Mancuernas',
@@ -96,8 +99,10 @@ export class EntrenamientoService {
         unidad: 'kg',
         fechaUltimo: '2026-04-19',
         series: 3,
+        grupoMuscular: 'Bíceps',
         historial: []
       },
+      // ESPALDA
       {
         id: 3,
         nombre: 'Peso Muerto',
@@ -106,8 +111,10 @@ export class EntrenamientoService {
         unidad: 'kg',
         fechaUltimo: '2026-04-21',
         series: 3,
+        grupoMuscular: 'Espalda',
         historial: []
       },
+      // PIERNA
       {
         id: 4,
         nombre: 'Sentadilla',
@@ -116,8 +123,10 @@ export class EntrenamientoService {
         unidad: 'kg',
         fechaUltimo: '2026-04-20',
         series: 4,
+        grupoMuscular: 'Pierna',
         historial: []
       },
+      // ESPALDA
       {
         id: 5,
         nombre: 'Dominadas',
@@ -126,8 +135,10 @@ export class EntrenamientoService {
         unidad: 'kg',
         fechaUltimo: '2026-04-18',
         series: 3,
+        grupoMuscular: 'Espalda',
         historial: []
       },
+      // ESPALDA
       {
         id: 6,
         nombre: 'Remo con Barra',
@@ -136,8 +147,10 @@ export class EntrenamientoService {
         unidad: 'kg',
         fechaUltimo: '2026-04-21',
         series: 4,
+        grupoMuscular: 'Espalda',
         historial: []
       },
+      // HOMBRO
       {
         id: 7,
         nombre: 'Press Militar',
@@ -146,8 +159,10 @@ export class EntrenamientoService {
         unidad: 'kg',
         fechaUltimo: '2026-04-19',
         series: 3,
+        grupoMuscular: 'Hombro',
         historial: []
       },
+      // TRÍCEPS
       {
         id: 8,
         nombre: 'Extensión de Tríceps',
@@ -156,8 +171,10 @@ export class EntrenamientoService {
         unidad: 'kg',
         fechaUltimo: '2026-04-18',
         series: 3,
+        grupoMuscular: 'Tríceps',
         historial: []
       },
+      // PIERNA
       {
         id: 9,
         nombre: 'Prensa de Piernas',
@@ -166,6 +183,103 @@ export class EntrenamientoService {
         unidad: 'kg',
         fechaUltimo: '2026-04-20',
         series: 4,
+        grupoMuscular: 'Pierna',
+        historial: []
+      },
+      // ABDOMINALES
+      {
+        id: 10,
+        nombre: 'Abdominales en Máquina',
+        imagen: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop',
+        pesoMaximo: 80,
+        unidad: 'kg',
+        fechaUltimo: '2026-04-19',
+        series: 3,
+        grupoMuscular: 'Abdominales',
+        historial: []
+      },
+      // BÍCEPS
+      {
+        id: 11,
+        nombre: 'Curl de Bíceps en Barra',
+        imagen: 'https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=300&h=200&fit=crop',
+        pesoMaximo: 45,
+        unidad: 'kg',
+        fechaUltimo: '2026-04-20',
+        series: 3,
+        grupoMuscular: 'Bíceps',
+        historial: []
+      },
+      // HOMBRO
+      {
+        id: 12,
+        nombre: 'Elevaciones Laterales',
+        imagen: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop',
+        pesoMaximo: 20,
+        unidad: 'kg',
+        fechaUltimo: '2026-04-19',
+        series: 3,
+        grupoMuscular: 'Hombro',
+        historial: []
+      },
+      // PIERNA
+      {
+        id: 13,
+        nombre: 'Leg Curl',
+        imagen: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop',
+        pesoMaximo: 100,
+        unidad: 'kg',
+        fechaUltimo: '2026-04-18',
+        series: 3,
+        grupoMuscular: 'Pierna',
+        historial: []
+      },
+      // PECHO
+      {
+        id: 14,
+        nombre: 'Aperturas con Mancuernas',
+        imagen: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop',
+        pesoMaximo: 35,
+        unidad: 'kg',
+        fechaUltimo: '2026-04-21',
+        series: 3,
+        grupoMuscular: 'Pecho',
+        historial: []
+      },
+      // TRÍCEPS
+      {
+        id: 15,
+        nombre: 'Fondos entre Bancos',
+        imagen: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop',
+        pesoMaximo: 60,
+        unidad: 'kg',
+        fechaUltimo: '2026-04-20',
+        series: 3,
+        grupoMuscular: 'Tríceps',
+        historial: []
+      },
+      // ESPALDA
+      {
+        id: 16,
+        nombre: 'Jalón Lateral',
+        imagen: 'https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=300&h=200&fit=crop',
+        pesoMaximo: 90,
+        unidad: 'kg',
+        fechaUltimo: '2026-04-19',
+        series: 3,
+        grupoMuscular: 'Espalda',
+        historial: []
+      },
+      // ABDOMINALES
+      {
+        id: 17,
+        nombre: 'Crunches',
+        imagen: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop',
+        pesoMaximo: 0,
+        unidad: 'kg',
+        fechaUltimo: '2026-04-21',
+        series: 3,
+        grupoMuscular: 'Abdominales',
         historial: []
       }
     ];

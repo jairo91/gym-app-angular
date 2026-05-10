@@ -9,19 +9,29 @@
             ".validate": "newData.hasChildren(['nombre', 'descripcion', 'ejercicios', 'id', 'fechaCreacion', 'fechaModificacion'])"
           }
         },
-        "rutinas": {
-          ".validate": "newData.hasChildren(['entrenamientoId', 'series'])"
-        },
         "historial": {
+          ".read": true,
+          ".write": true,
           "$historialId": {
             ".validate": "newData.hasChildren(['ejercicioId', 'nombreEjercicio', 'fecha', 'peso', 'repeticiones', 'series'])"
           }
         },
         "historial-ejercicios": {
+          ".read": true,
+          ".write": true,
           ".validate": "newData.val() === null || newData.hasChildren()"
         },
         "perfil": {
+          ".read": true,
+          ".write": true,
           ".validate": "newData.hasChildren(['nombre'])"
+        },
+        "rutinas": {
+          ".read": true,
+          ".write": true,
+          "$rutinaId": {
+            ".validate": "newData.hasChildren(['entrenamientoId', 'series'])"
+          }
         }
       }
     },

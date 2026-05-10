@@ -136,17 +136,23 @@
     <div class="modal-body">
       <p>Selecciona los ejercicios que quieres incluir en tu entrenamiento personalizado:</p>
 
-      <div class="exercises-grid">
-        <div *ngFor="let exercise of availableExercises" class="exercise-item"
-             [class.selected]="isExerciseSelected(exercise)"
-             (click)="toggleExerciseSelection(exercise)">
-          <img [src]="exercise.imagen" [alt]="exercise.nombre" class="exercise-item-image">
-          <div class="exercise-item-info">
-            <h4>{{ exercise.nombre }}</h4>
-            <p>Peso máximo: {{ exercise.pesoMaximo }} {{ exercise.unidad }}</p>
-          </div>
-          <div class="exercise-checkbox">
-            <input type="checkbox" [checked]="isExerciseSelected(exercise)" readonly>
+      <!-- Ejercicios agrupados por grupos musculares -->
+      <div class="grupos-musculares">
+        <div *ngFor="let grupo of ejerciciosPorGrupo" class="grupo-muscular-section">
+          <h4 class="grupo-titulo">{{ grupo.grupoMuscular }}</h4>
+          <div class="exercises-grid">
+            <div *ngFor="let exercise of grupo.ejercicios" class="exercise-item"
+                 [class.selected]="isExerciseSelected(exercise)"
+                 (click)="toggleExerciseSelection(exercise)">
+              <img [src]="exercise.imagen" [alt]="exercise.nombre" class="exercise-item-image">
+              <div class="exercise-item-info">
+                <h4>{{ exercise.nombre }}</h4>
+                <p>RM: {{ exercise.pesoMaximo }} {{ exercise.unidad }}</p>
+              </div>
+              <div class="exercise-checkbox">
+                <input type="checkbox" [checked]="isExerciseSelected(exercise)" readonly>
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -182,6 +182,7 @@ export class FirebaseExerciseService {
         unidad: 'kg',
         fechaUltimo: '2026-04-20',
         series: 4,
+        grupoMuscular: 'Pecho',
         historial: []
       },
       {
@@ -192,6 +193,7 @@ export class FirebaseExerciseService {
         unidad: 'kg',
         fechaUltimo: '2026-04-19',
         series: 3,
+        grupoMuscular: 'Bíceps',
         historial: []
       },
       {
@@ -202,6 +204,7 @@ export class FirebaseExerciseService {
         unidad: 'kg',
         fechaUltimo: '2026-04-21',
         series: 3,
+        grupoMuscular: 'Espalda',
         historial: []
       },
       {
@@ -212,6 +215,7 @@ export class FirebaseExerciseService {
         unidad: 'kg',
         fechaUltimo: '2026-04-20',
         series: 4,
+        grupoMuscular: 'Pierna',
         historial: []
       },
       {
@@ -222,6 +226,7 @@ export class FirebaseExerciseService {
         unidad: 'kg',
         fechaUltimo: '2026-04-18',
         series: 3,
+        grupoMuscular: 'Espalda',
         historial: []
       },
       {
@@ -232,6 +237,7 @@ export class FirebaseExerciseService {
         unidad: 'kg',
         fechaUltimo: '2026-04-21',
         series: 4,
+        grupoMuscular: 'Espalda',
         historial: []
       },
       {
@@ -242,6 +248,7 @@ export class FirebaseExerciseService {
         unidad: 'kg',
         fechaUltimo: '2026-04-19',
         series: 3,
+        grupoMuscular: 'Hombro',
         historial: []
       },
       {
@@ -252,6 +259,7 @@ export class FirebaseExerciseService {
         unidad: 'kg',
         fechaUltimo: '2026-04-18',
         series: 3,
+        grupoMuscular: 'Tríceps',
         historial: []
       },
       {
@@ -262,6 +270,7 @@ export class FirebaseExerciseService {
         unidad: 'kg',
         fechaUltimo: '2026-04-20',
         series: 4,
+        grupoMuscular: 'Pierna',
         historial: []
       }
     ];

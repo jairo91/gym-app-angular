@@ -3,12 +3,17 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Workout, WorkoutExercise } from '../../models/workout/workout.model';
 import { Serie } from '../../models/exercise/exercise-history.model';
-import { Exercise } from '../../models/exercise/exercise.model';
+import { Exercise, GrupoMuscular } from '../../models/exercise/exercise.model';
 import { EntrenamientoService } from '../../services/entrenamiento.service';
 import { FirebaseEntrenamientoService } from '../../services/firebase-entrenamiento.service';
 import { FirebaseHistorialService } from '../../services/firebase-historial.service';
 import { Entrenamiento } from '../../models/entrenamiento/entrenamiento.model';
 import { Subscription } from 'rxjs';
+
+interface GrupoEjercicios {
+  grupoMuscular: GrupoMuscular;
+  ejercicios: Exercise[];
+}
 
 @Component({
   selector: 'app-rutina',
@@ -23,10 +28,13 @@ export class RutinaComponent implements OnInit, OnDestroy {
   currentWorkoutExercises: WorkoutExercise[] = [];
   showAddExerciseModal = false;
   availableExercises: Exercise[] = [];
+  ejerciciosPorGrupo: GrupoEjercicios[] = [];
   selectedExercises: Exercise[] = [];
   isSaving = false;
   savedMessage = '';
   private entrenamientosSub?: Subscription;
+
+  private readonly ordenGrupos: GrupoMuscular[] = ['Pecho', 'Espalda', 'Bíceps', 'Tríceps', 'Hombro', 'Pierna', 'Abdominales'];
 
   constructor(
     private entrenamientoService: EntrenamientoService,
@@ -90,6 +98,32 @@ export class RutinaComponent implements OnInit, OnDestroy {
 
   loadAvailableExercises() {
     this.availableExercises = this.entrenamientoService.getEjerciciosDisponibles();
+    this.agruparEjerciciosPorGrupo();
+  }
+
+  agruparEjerciciosPorGrupo() {
+    const mapa = new Map<GrupoMuscular, Exercise[]>();
+
+    // Inicializar todos los grupos
+    this.ordenGrupos.forEach(grupo => {
+      mapa.set(grupo, []);
+    });
+
+    // Agrupar ejercicios
+    this.availableExercises.forEach(ejercicio => {
+      const grupo = ejercicio.grupoMuscular;
+      if (mapa.has(grupo)) {
+        mapa.get(grupo)!.push(ejercicio);
+      }
+    });
+
+    // Convertir a array ordenado
+    this.ejerciciosPorGrupo = this.ordenGrupos
+      .filter(grupo => mapa.get(grupo)!.length > 0)
+      .map(grupo => ({
+        grupoMuscular: grupo,
+        ejercicios: mapa.get(grupo)!
+      }));
   }
 
   get isSaveWorkoutDisabled(): boolean {
