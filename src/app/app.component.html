@@ -8,6 +8,7 @@
     <a *ngIf="isLoggedIn" routerLink="/entrenamientos" routerLinkActive="active">Gestión de Entrenamientos</a>
     <a *ngIf="isLoggedIn" routerLink="/imc" routerLinkActive="active">IMC</a>
     <a *ngIf="isLoggedIn" routerLink="/perfil" routerLinkActive="active">Perfil</a>
+    <a *ngIf="isLoggedIn && isAdmin" routerLink="/configuracion" routerLinkActive="active" class="admin-link">⚙️ Configuración</a>
     <a *ngIf="isLoggedIn" (click)="logout()" style="cursor: pointer;">Logout</a>
   </nav>
 </header>

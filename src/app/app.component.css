@@ -43,6 +43,17 @@ nav a.active {
   color: #ffffff;
 }
 
+nav a.admin-link {
+  background: rgba(255, 193, 7, 0.1);
+  color: #ffc107;
+  font-weight: 600;
+}
+
+nav a.admin-link:hover {
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffed4e;
+}
+
 .page-shell {
   max-width: 1120px;
   margin: 1.5rem auto;

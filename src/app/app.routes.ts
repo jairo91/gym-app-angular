@@ -8,7 +8,9 @@ import { RutinaComponent } from './Components/rutina/rutina.component';
 import { EntrenamientosComponent } from './Components/entrenamientos/entrenamientos.component';
 import { PerfilComponent } from './Components/perfil/perfil.component';
 import { AuthGuard } from './guards/auth.guard';
+import { AdminGuard } from './guards/admin.guard';
 import { HomeComponent } from './Components/home/home.component';
+import { AdminSettingsComponent } from './Components/settings/admin-settings.component';
 
 export const routes: Routes = [
   {
@@ -47,5 +49,10 @@ export const routes: Routes = [
     path: 'perfil',
     component: PerfilComponent,
     canActivate: [AuthGuard]
+  },
+  {
+    path: 'configuracion',
+    component: AdminSettingsComponent,
+    canActivate: [AuthGuard, AdminGuard]
   }
 ];

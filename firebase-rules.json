@@ -8,7 +8,7 @@
           "$entrenamientoId": {
             ".validate": "newData.hasChildren(['nombre', 'descripcion', 'ejercicios', 'id', 'fechaCreacion', 'fechaModificacion'])"
           }
-        },
+        },      
         "historial": {
           ".read": true,
           ".write": true,

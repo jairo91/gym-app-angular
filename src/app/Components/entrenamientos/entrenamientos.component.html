@@ -222,18 +222,24 @@
         <p>No hay ejercicios disponibles en este momento.</p>
       </div>
 
-      <div class="exercises-grid">
-        <div *ngFor="let exercise of availableExercises"
-             class="exercise-item"
-             [class.selected]="isExerciseSelected(exercise)"
-             (click)="toggleExerciseSelection(exercise)">
-          <img [src]="exercise.imagen" [alt]="exercise.nombre" class="exercise-image">
-          <div class="exercise-info">
-            <h4>{{ exercise.nombre }}</h4>
-            <p>RM: {{ exercise.pesoMaximo }} {{ exercise.unidad }}</p>
-          </div>
-          <div class="exercise-checkbox">
-            <input type="checkbox" [checked]="isExerciseSelected(exercise)" readonly>
+      <!-- Ejercicios agrupados por grupos musculares -->
+      <div class="grupos-musculares">
+        <div *ngFor="let grupo of ejerciciosPorGrupo" class="grupo-muscular-section">
+          <h4 class="grupo-titulo">{{ grupo.grupoMuscular }}</h4>
+          <div class="exercises-grid">
+            <div *ngFor="let exercise of grupo.ejercicios"
+                 class="exercise-item"
+                 [class.selected]="isExerciseSelected(exercise)"
+                 (click)="toggleExerciseSelection(exercise)">
+              <img [src]="exercise.imagen" [alt]="exercise.nombre" class="exercise-image">
+              <div class="exercise-info">
+                <h4>{{ exercise.nombre }}</h4>
+                <p>RM: {{ exercise.pesoMaximo }} {{ exercise.unidad }}</p>
+              </div>
+              <div class="exercise-checkbox">
+                <input type="checkbox" [checked]="isExerciseSelected(exercise)" readonly>
+              </div>
+            </div>
           </div>
         </div>
       </div>

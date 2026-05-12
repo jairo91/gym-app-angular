@@ -6,8 +6,13 @@
     </p>
 
     <div class="cta-buttons">
-      <a routerLink="/register" routerLinkActive="active" class="btn btn-primary">Crear cuenta</a>
-      <a routerLink="/login" routerLinkActive="active" class="btn btn-secondary">Iniciar sesión</a>
+      <ng-container *ngIf="(currentUser$ | async) === null; else loggedIn">
+        <a routerLink="/register" routerLinkActive="active" class="btn btn-primary">Crear cuenta</a>
+        <a routerLink="/login" routerLinkActive="active" class="btn btn-secondary">Iniciar sesión</a>
+      </ng-container>
+      <ng-template #loggedIn>
+        <a routerLink="/rutina" routerLinkActive="active" class="btn btn-primary">Entrenar</a>
+      </ng-template>
     </div>
   </div>
 

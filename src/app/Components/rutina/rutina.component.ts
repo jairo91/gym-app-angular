@@ -187,12 +187,17 @@ export class RutinaComponent implements OnInit, OnDestroy {
       const promesas = ejerciciosConSeries.map(ex => {
         const pesoMaximo = Math.max(...ex.series.map(s => s.peso));
         const ultimaSerie = ex.series[ex.series.length - 1];
+        // Formato de repeticiones por serie: 30 (una serie), 4/5 (dos series), etc.
+        const repeticionesPorSerie = ex.series.map(s => s.repeticiones).join('/');
+        
         return this.firebaseHistorial.agregarAlHistorial({
           ejercicioId: ex.id,
           nombreEjercicio: ex.nombre,
+          imagenEjercicio: ex.imagen,
           fecha: new Date(this.selectedDate).toISOString(),
           series: ex.series.length,
           repeticiones: ultimaSerie.repeticiones,
+          repeticionesPorSerie: repeticionesPorSerie,
           peso: pesoMaximo,
           notas: `${this.selectedWorkout?.nombre} — ${ex.series.map(s => `${s.repeticiones}x${s.peso}kg`).join(', ')}`
         });

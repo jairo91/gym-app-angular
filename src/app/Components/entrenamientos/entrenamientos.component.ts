@@ -3,10 +3,15 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { Entrenamiento, EntrenamientoEjercicio } from '../../models/entrenamiento/entrenamiento.model';
-import { Exercise } from '../../models/exercise/exercise.model';
+import { Exercise, GrupoMuscular } from '../../models/exercise/exercise.model';
 import { FirebaseEntrenamientoService } from '../../services/firebase-entrenamiento.service';
 import { FirebaseExerciseService } from '../../services/firebase-exercise.service';
 import { EntrenamientoService } from '../../services/entrenamiento.service';
+
+interface GrupoEjercicios {
+  grupoMuscular: GrupoMuscular;
+  ejercicios: Exercise[];
+}
 
 @Component({
   selector: 'app-entrenamientos',
@@ -17,6 +22,7 @@ import { EntrenamientoService } from '../../services/entrenamiento.service';
 export class EntrenamientosComponent implements OnInit {
   entrenamientos$!: Observable<Entrenamiento[]>;
   availableExercises: Exercise[] = [];
+  ejerciciosPorGrupo: GrupoEjercicios[] = [];
   
   showCreateModal = false;
   showEditModal = false;
@@ -35,6 +41,8 @@ export class EntrenamientosComponent implements OnInit {
   selectedExercises: Exercise[] = [];
   currentEntrenamientoExercises: EntrenamientoEjercicio[] = [];
 
+  private readonly ordenGrupos: GrupoMuscular[] = ['Pecho', 'Espalda', 'Bíceps', 'Tríceps', 'Hombro', 'Pierna', 'Abdominales'];
+
   constructor(
     private firebaseEntrenamiento: FirebaseEntrenamientoService,
     private firebaseExercise: FirebaseExerciseService,
@@ -46,17 +54,45 @@ export class EntrenamientosComponent implements OnInit {
     console.log('Inicializando componentes y cargando datos...');
     this.entrenamientos$ = this.firebaseEntrenamiento.getEntrenamientos$();
     this.availableExercises = this.entrenamientoService.getEjerciciosDisponibles();
+    this.agruparEjerciciosPorGrupo();
 
     this.firebaseExercise.getEjerciciosDisponibles$().subscribe({
       next: (ejercicios) => {
         this.availableExercises = ejercicios.length > 0
           ? ejercicios
           : this.entrenamientoService.getEjerciciosDisponibles();
+        this.agruparEjerciciosPorGrupo();
       },
       error: () => {
         this.availableExercises = this.entrenamientoService.getEjerciciosDisponibles();
+        this.agruparEjerciciosPorGrupo();
       }
     });
+  }
+
+  agruparEjerciciosPorGrupo() {
+    const mapa = new Map<GrupoMuscular, Exercise[]>();
+
+    // Inicializar todos los grupos
+    this.ordenGrupos.forEach(grupo => {
+      mapa.set(grupo, []);
+    });
+
+    // Agrupar ejercicios
+    this.availableExercises.forEach(ejercicio => {
+      const grupo = ejercicio.grupoMuscular;
+      if (mapa.has(grupo)) {
+        mapa.get(grupo)!.push(ejercicio);
+      }
+    });
+
+    // Convertir a array ordenado
+    this.ejerciciosPorGrupo = this.ordenGrupos
+      .filter(grupo => mapa.get(grupo)!.length > 0)
+      .map(grupo => ({
+        grupoMuscular: grupo,
+        ejercicios: mapa.get(grupo)!
+      }));
   }
 
   // Crear entrenamiento
