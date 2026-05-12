@@ -1,0 +1,130 @@
+<div class="admin-container" *ngIf="isAdmin">
+  <h1>Panel de Administración</h1>
+  
+  <div class="admin-section">
+    <h2>Gestión de Ejercicios</h2>
+    
+    <!-- Mensajes de éxito/error -->
+    <div *ngIf="successMessage" class="alert alert-success">
+      {{ successMessage }}
+    </div>
+    <div *ngIf="errorMessage" class="alert alert-error">
+      {{ errorMessage }}
+    </div>
+
+    <!-- Botón para agregar ejercicio -->
+    <button (click)="toggleAddForm()" class="btn btn-primary">
+      {{ showAddForm ? 'Cancelar' : 'Agregar Nuevo Ejercicio' }}
+    </button>
+
+    <!-- Formulario para agregar/editar ejercicio -->
+    <div *ngIf="showAddForm" class="exercise-form">
+      <h3>{{ editingId ? 'Editar Ejercicio' : 'Nuevo Ejercicio' }}</h3>
+      
+      <form [formGroup]="exerciseForm" (ngSubmit)="submitExercise()">
+        <div class="form-group">
+          <label for="nombre">Nombre del Ejercicio *</label>
+          <input 
+            type="text" 
+            id="nombre" 
+            formControlName="nombre"
+            class="form-control"
+            placeholder="Ej: Flexiones"
+          />
+          <div *ngIf="exerciseForm.get('nombre')?.invalid && exerciseForm.get('nombre')?.touched" class="error-text">
+            El nombre debe tener al menos 3 caracteres
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="grupoMuscular">Grupo Muscular *</label>
+          <select 
+            id="grupoMuscular" 
+            formControlName="grupoMuscular"
+            class="form-control"
+          >
+            <option value="">Selecciona un grupo muscular</option>
+            <option *ngFor="let grupo of gruposMuscularesOptions" [value]="grupo">
+              {{ grupo }}
+            </option>
+          </select>
+          <div *ngIf="exerciseForm.get('grupoMuscular')?.invalid && exerciseForm.get('grupoMuscular')?.touched" class="error-text">
+            Selecciona un grupo muscular
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="imagen">URL de la Imagen *</label>
+          <input 
+            type="url" 
+            id="imagen" 
+            formControlName="imagen"
+            class="form-control"
+            placeholder="https://ejemplo.com/imagen.jpg"
+          />
+          <div *ngIf="exerciseForm.get('imagen')?.invalid && exerciseForm.get('imagen')?.touched" class="error-text">
+            Ingresa una URL válida
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="descripcion">Descripción</label>
+          <textarea 
+            id="descripcion" 
+            formControlName="descripcion"
+            class="form-control"
+            placeholder="Describe el ejercicio..."
+            rows="4"
+          ></textarea>
+        </div>
+
+        <div class="form-buttons">
+          <button type="submit" class="btn btn-success" [disabled]="exerciseForm.invalid">
+            {{ editingId ? 'Actualizar Ejercicio' : 'Agregar Ejercicio' }}
+          </button>
+          <button type="button" (click)="cancelEdit()" class="btn btn-secondary">
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Lista de ejercicios -->
+    <div class="exercises-list">
+      <h3>Ejercicios Disponibles ({{ exercises.length }})</h3>
+      
+      <div *ngIf="exercises.length === 0" class="no-exercises">
+        <p>No hay ejercicios aún. ¡Agrega el primero!</p>
+      </div>
+
+      <div *ngIf="exercises.length > 0" class="exercises-grid">
+        <div *ngFor="let exercise of exercises" class="exercise-card">
+          <img 
+            [src]="exercise.imagen" 
+            [alt]="exercise.nombre"
+            class="exercise-image"
+            onerror="this.src='https://via.placeholder.com/200'"
+          />
+          <div class="exercise-content">
+            <h4>{{ exercise.nombre }}</h4>
+            <p class="muscle-group">{{ exercise.grupoMuscular }}</p>
+            <p *ngIf="exercise.descripcion" class="description">{{ exercise.descripcion }}</p>
+          </div>
+          <div class="exercise-actions">
+            <button (click)="editExercise(exercise)" class="btn btn-sm btn-info">
+              Editar
+            </button>
+            <button (click)="deleteExercise(exercise.id!)" class="btn btn-sm btn-danger">
+              Eliminar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="!isAdmin" class="access-denied">
+  <h2>Acceso Denegado</h2>
+  <p>No tienes permisos para acceder a esta página.</p>
+</div>
